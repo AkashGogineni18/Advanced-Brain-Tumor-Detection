@@ -1,0 +1,100 @@
+{% extends "import.html" %} 
+{% block content %}
+
+<style>
+    body {
+        background-image: url('https://wallpapers.com/images/hd/brain-background-mcl1xtgzyvk3pydj.jpg');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+    .container {
+        background-color: rgba(14, 11, 11, 0.8);
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+        color: #fff; /* Set text color to white */
+    }
+    h2 {
+        color: #f0ecec;
+    }
+    .btn {
+        margin: 10px 0;
+    }
+    .btn-success {
+        background-color: rgb(250, 247, 247);
+        border-color: silver;
+        color: black;
+    }
+    .btn-success:hover {
+        background-color: #f2eaea;
+        border-color: #d3d3d3;
+    }
+    .image-section img {
+        border: 2px solid #ddd;
+        border-radius: 10px;
+    }
+    .loader {
+        border: 16px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 16px solid #3498db;
+        width: 120px;
+        height: 120px;
+        animation: spin 2s linear infinite;
+        margin: 20px auto;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+
+<center>
+    <div class="container">
+        <br><h2>Brain Tumor Detection Using Deep Learning</h2><br>
+        <form id="upload-file" method="post" enctype="multipart/form-data">
+             <input type="file" name="file" class="btn btn-success" id="imageUpload" accept=".png, .jpg, .jpeg">
+        </form>
+        <div class="image-section" style="display:none;">
+             <img id="imagePreview" class="img-responsive" src="#" style="width:300px;height:300px;"/><br><br>
+             <div>
+                <button type="button" class="btn btn-info btn-lg" id="btn-predict">Predict!</button>
+             </div>
+        </div>
+        <div class="loader" style="display:none;"></div>
+        <h3 id="result">
+            <span style="color: white;"> <!-- Set font color to white -->
+                <!-- Result will be dynamically inserted here -->
+            </span>
+        </h3>
+    </div>
+</center><br><br>
+
+<script>
+    document.getElementById('imageUpload').onchange = function() {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('imagePreview').src = e.target.result;
+            document.querySelector('.image-section').style.display = 'block';
+        };
+        reader.readAsDataURL(this.files[0]);
+    };
+
+    document.getElementById('btn-predict').onclick = function() {
+        var formData = new FormData(document.getElementById('upload-file'));
+        document.querySelector('.loader').style.display = 'block';
+        fetch('/predict', {
+            method: 'POST',
+            body: formData,
+        }).then(response => response.text()).then(data => {
+            document.querySelector('.loader').style.display = 'none';
+            document.getElementById('result').querySelector('span').innerHTML = data;
+        }).catch(error => {
+            console.error('Error:', error);
+            document.querySelector('.loader').style.display = 'none';
+            document.getElementById('result').querySelector('span').innerHTML = 'An error occurred.';
+        });
+    };
+</script>
+
+{% endblock %}
